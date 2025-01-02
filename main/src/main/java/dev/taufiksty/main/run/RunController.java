@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/runs")
-public class RunController {
+class RunController {
 
     private final RunRepository runRepository;
 

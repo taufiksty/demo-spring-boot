@@ -26,11 +26,12 @@ public class JdbcClientRunRepository {
                 .list();
     }
 
-    public Optional<Run> findById(Integer id) {
+    public Run findById(Integer id) {
         return jdbcClient.sql("SELECT * FROM run WHERE id = :id")
                 .param("id", id)
                 .query(Run.class)
-                .optional();
+                .optional()
+                .orElseThrow(() -> new RunException.RunNotFoundException("Run Not Found"));
     }
 
     public void create(Run run) {
