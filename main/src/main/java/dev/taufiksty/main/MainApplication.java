@@ -1,15 +1,17 @@
 package dev.taufiksty.main;
 
-import dev.taufiksty.main.run.Location;
-import dev.taufiksty.main.run.Run;
+import dev.taufiksty.main.user.User;
+import dev.taufiksty.main.user.UserHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.time.LocalDateTime;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @SpringBootApplication
 public class MainApplication {
@@ -21,17 +23,19 @@ public class MainApplication {
     }
 
     @Bean
-    CommandLineRunner runner() {
+    UserHttpClient userHttpClient(@Value("${user.service.url}") String baseUrl) {
+        RestClient restClient = RestClient.create(baseUrl);
+        HttpServiceProxyFactory  factory = HttpServiceProxyFactory
+                .builderFor(RestClientAdapter.create(restClient))
+                .build();
+        return factory.createClient(UserHttpClient.class);
+    }
+
+    @Bean
+    CommandLineRunner runner(UserHttpClient userHttpClient) {
         return args -> {
-            Run run = new Run(
-                    1,
-                    "First Run",
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusHours(1),
-                    5,
-                    Location.OUTDOOR
-            );
-            log.info("Run: {}", run);
+            User user = userHttpClient.findById(1);
+            log.info("User id: {}, name: {}", user.id(), user.name());
         };
     }
 }

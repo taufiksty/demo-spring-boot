@@ -31,21 +31,26 @@ public class RunController {
         return run.get();
     }
 
+    @GetMapping("/location/{location}")
+    List<Run> findRunByLocation(@PathVariable String location) {
+        return runRepository.findAllByLocation(Location.valueOf(location));
+    }
+
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     void createRun(@Valid @RequestBody Run run) {
-        runRepository.create(run);
+        runRepository.save(run);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void updateRun(@Valid @PathVariable Integer id, @RequestBody Run run) {
-        runRepository.update(run, id);
+        runRepository.save(run);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteRun(@PathVariable Integer id) {
-        runRepository.delete(id);
+        runRepository.delete(runRepository.findById(id).get());
     }
 }
